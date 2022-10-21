@@ -93,7 +93,7 @@ app.use('/api/shoes', (req, res, next) => {
         userId: 'qsomihvqios',
       },
     ];
-    
+
     res.status(200).json(clothing);
     next();
   });
