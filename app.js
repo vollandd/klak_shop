@@ -1,14 +1,24 @@
-const http = require('http');
+const express = require('express');
 
-const hostname = '127.0.0.1';
-const port = 3000;
+const app = express();
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello, kalk_shop!\n');
+app.use((req, res, next) => {
+    console.log(('requête reçue !'));
+    next();
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+app.use((req, res, next) => {
+    res.status(201);
+    next();
 });
+
+app.use((req, res, next) => {
+    res.json({ message: 'votre requête a bien été reçue !'});
+    next();
+});
+
+app.use((req, res, next) => {
+    console.log(('requête envoyé avec succès !'));
+});
+
+module.exports = app;
