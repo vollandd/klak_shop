@@ -1,1 +1,0 @@
-# klak_shop
