@@ -1,10 +1,13 @@
 const express = require('express');
 
 const app = express();
+require('dotenv').config();
 
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb+srv://admin:admin@cluster0.vriyyo4.mongodb.net/?retryWrites=true&w=majority',
+
+
+mongoose.connect(process.env.ID_BDD,
 { useNewUrlParser: true,
   useUnifiedTopology: true })
 .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -93,7 +96,7 @@ app.use('/api/shoes', (req, res, next) => {
         userId: 'qsomihvqios',
       },
     ];
-
+    
     res.status(200).json(clothing);
     next();
   });
@@ -118,8 +121,13 @@ app.use('/api/shoes', (req, res, next) => {
     Product.find()
       .then(products => res.status(200).json(products))
       .catch(error => res.status(400).json({ error }));
+      next();
   });
 
-  
+  app.get('/api/stuff/:id', (req, res, next) => {
+    Thing.findOne({ _id: req.params.id })
+      .then(thing => res.status(200).json(thing))
+      .catch(error => res.status(404).json({ error }));
+  });
 
 module.exports = app;
