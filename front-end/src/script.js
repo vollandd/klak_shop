@@ -1,4 +1,4 @@
-let urlShoes = "http://127.0.0.1:3000/api/shoes";
+let urlShoes = "http://127.0.0.1:3000/api/Shoes";
 let txt = "";
 fetch(urlShoes)
     .then((resp) => resp.json())
