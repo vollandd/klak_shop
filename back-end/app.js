@@ -1,10 +1,11 @@
 const express = require('express');
 
 const app = express();
-
+require('dotenv').config();
 const mongoose = require('mongoose');
+console.log(process.env.ID_BDD)
 
-mongoose.connect('mongodb+srv://admin:admin@cluster0.9etnbuz.mongodb.net/test',
+mongoose.connect(process.env.ID_BDD,
 { useNewUrlParser: true,
   useUnifiedTopology: true })
 .then(() => console.log('Connexion à MongoDB réussie !'))
