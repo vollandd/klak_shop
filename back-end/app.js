@@ -2,14 +2,12 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const validator = require("email-validator");
 const jwt = require('jsonwebtoken');
-
-
 const app = express();
 require('dotenv').config();
 const mongoose = require('mongoose');
-const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
-
 const passwordValidator = require('password-validator');
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
 // Create a schema
 const schema = new passwordValidator();
 
@@ -146,6 +144,8 @@ const User = require('./models/user.js');
 app.post('/api/signup', (req, res) => {
   const { username, password, email } = req.query;
 
+
+
   // Validate the sign-up information
   if (!username || !password || !email) {
     return res.status(400).send({ error: 'Tout les champs sont requis' });
@@ -175,13 +175,15 @@ app.post('/api/signup', (req, res) => {
 
 app.post('/api/login', (req, res) => {
   // Validate parameters
-  const { username, password} = req.query;
-  if (!username || !password) {
+  console.log(req.body);
+  const email = req.body.email;
+  const password = req.body.password;
+  if (!email || !password) {
     return res.status(400).json({ error: 'Invalid parameters' });
   }
 
   // Search for user with provided username
-  User.findOne({ username: username }, (err, user) => {
+  User.findOne({ email: email }, (err, user) => {
     if (err) {
       return res.status(500).json({ error: 'Error searching for user' });
     }
@@ -202,7 +204,8 @@ app.post('/api/login', (req, res) => {
       const token = jwt.sign({ userId: user._id }, process.env.PRIVATE_TOKEN, { expiresIn: '1h' });
 
       // Return JWT to client
-      res.status(201).json({ message: 'Vous êtes connecté avec le token', token});
+      res.send({  success: true,
+                        message : 'Vous êtes connecté avec le token',});
 
     });
   });
