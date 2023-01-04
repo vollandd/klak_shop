@@ -1,9 +1,10 @@
 const express = require('express');
-
+const bcrypt = require('bcrypt');
 const app = express();
 require('dotenv').config();
 const mongoose = require('mongoose');
-console.log(process.env.ID_BDD)
+const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+
 
 mongoose.connect(process.env.ID_BDD,
 { useNewUrlParser: true,
@@ -17,6 +18,8 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   next();
 });
+
+
 
 
 app.use('/api/shoes', (req, res, next) => {
@@ -120,6 +123,35 @@ app.use('/api/shoes', (req, res, next) => {
       .then(products => res.status(200).json(products))
       .catch(error => res.status(400).json({ error }));
   });
+
+const User = require('./models/user.js');
+
+
+app.post('/api/signup', (req, res) => {
+  const { username, password, email } = req.query;
+
+  // Validate the sign-up information
+  if (!username || !password || !email) {
+    return res.status(400).send({ error: 'Tout les champs sont requis' });
+  }
+  if (!strongPasswordRegex.test(password)){
+    return res.status(400).send({error: 'Le mot de passe doit avoir 8 caractere, 1 majuscule, 1 chiffre et un caractere spécial  '})
+  }
+
+  // Hash the password
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  // Store the user in the database
+  const user =new User({
+    username: username,
+    email: email,
+    password: hashedPassword,
+
+  });
+  user.save()
+      .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
+      .catch(error => res.status(400).json({ error }));
+
+});
 
   
 
