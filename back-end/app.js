@@ -1,10 +1,26 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const validator = require("email-validator");
+const jwt = require('jsonwebtoken');
+
+
 const app = express();
 require('dotenv').config();
 const mongoose = require('mongoose');
 const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
 
+const passwordValidator = require('password-validator');
+// Create a schema
+const schema = new passwordValidator();
+
+// Add properties to it
+schema
+    .is().min(8,'minimum 8 caractere')                                    // Minimum length 8
+    .has().symbols(1,'doit contenir au moins 1 symbol')
+    .has().uppercase(1, 'doit contenir au moins 1 majuscule')                              // Must have uppercase letters
+    .has().lowercase(1, 'doit contenir au moins 1 minuscule')                              // Must have lowercase letters
+    .has().digits(1,'doit contenir au moins 1 chiffre')                                // Must have at least 1 digits
+    .has().not().spaces()                           // Should not have spaces
 
 mongoose.connect(process.env.ID_BDD,
 { useNewUrlParser: true,
@@ -134,8 +150,12 @@ app.post('/api/signup', (req, res) => {
   if (!username || !password || !email) {
     return res.status(400).send({ error: 'Tout les champs sont requis' });
   }
-  if (!strongPasswordRegex.test(password)){
-    return res.status(400).send({error: 'Le mot de passe doit avoir 8 caractere, 1 majuscule, 1 chiffre et un caractere spécial  '})
+  if(!validator.validate(email)){
+    return res.status(400).send({error: 'email invalide'})
+  }
+  if (!schema.validate(password)){
+    return res.status(400).send({error: schema.validate(password , { details: true })})
+
   }
 
   // Hash the password
@@ -153,6 +173,40 @@ app.post('/api/signup', (req, res) => {
 
 });
 
-  
+app.post('/api/login', (req, res) => {
+  // Validate parameters
+  const { username, password} = req.query;
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Invalid parameters' });
+  }
+
+  // Search for user with provided username
+  User.findOne({ username: username }, (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error searching for user' });
+    }
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid username or password' });
+    }
+
+    // Compare provided password to hashed password in database
+    bcrypt.compare(password, user.password, (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: 'Error comparing passwords' });
+      }
+      if (!result) {
+        return res.status(400).json({ error: 'Invalid username or password' });
+      }
+
+      // Create JWT
+      const token = jwt.sign({ userId: user._id }, process.env.PRIVATE_TOKEN, { expiresIn: '1h' });
+
+      // Return JWT to client
+      res.status(201).json({ message: 'Vous êtes connecté avec le token', token});
+
+    });
+  });
+});
+
 
 module.exports = app;
