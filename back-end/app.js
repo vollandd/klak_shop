@@ -6,9 +6,6 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 const userRoutes = require('./routes/userRouter');
 
-
-
-
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const validator = require("email-validator");
