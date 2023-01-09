@@ -1,13 +1,19 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const validator = require("email-validator");
-const jwt = require('jsonwebtoken');
 const app = express();
 require('dotenv').config();
 const mongoose = require('mongoose');
-const passwordValidator = require('password-validator');
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
+const userRoutes = require('./routes/userRouter');
+
+
+
+
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const validator = require("email-validator");
+const passwordValidator = require('password-validator');
+
 // Create a schema
 const schema = new passwordValidator();
 
@@ -19,6 +25,13 @@ schema
     .has().lowercase(1, 'doit contenir au moins 1 minuscule')                              // Must have lowercase letters
     .has().digits(1,'doit contenir au moins 1 chiffre')                                // Must have at least 1 digits
     .has().not().spaces()                           // Should not have spaces
+
+
+
+
+
+
+
 
 mongoose.connect(process.env.ID_BDD,
 { useNewUrlParser: true,
@@ -141,75 +154,12 @@ app.use('/api/shoes', (req, res, next) => {
 const User = require('./models/user.js');
 
 
-app.post('/api/signup', (req, res) => {
-  const { username, password, email } = req.query;
+
+app.use(express.json());
 
 
+app.use('/api/',userRoutes);
 
-  // Validate the sign-up information
-  if (!username || !password || !email) {
-    return res.status(400).send({ error: 'Tout les champs sont requis' });
-  }
-  if(!validator.validate(email)){
-    return res.status(400).send({error: 'email invalide'})
-  }
-  if (!schema.validate(password)){
-    return res.status(400).send({error: schema.validate(password , { details: true })})
-
-  }
-
-  // Hash the password
-  const hashedPassword = bcrypt.hashSync(password, 10);
-  // Store the user in the database
-  const user =new User({
-    username: username,
-    email: email,
-    password: hashedPassword,
-
-  });
-  user.save()
-      .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-      .catch(error => res.status(400).json({ error }));
-
-});
-
-app.post('/api/login', (req, res) => {
-  // Validate parameters
-  console.log(req.body);
-  const email = req.body.email;
-  const password = req.body.password;
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Invalid parameters' });
-  }
-
-  // Search for user with provided username
-  User.findOne({ email: email }, (err, user) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error searching for user' });
-    }
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid username or password' });
-    }
-
-    // Compare provided password to hashed password in database
-    bcrypt.compare(password, user.password, (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: 'Error comparing passwords' });
-      }
-      if (!result) {
-        return res.status(400).json({ error: 'Invalid username or password' });
-      }
-
-      // Create JWT
-      const token = jwt.sign({ userId: user._id }, process.env.PRIVATE_TOKEN, { expiresIn: '1h' });
-
-      // Return JWT to client
-      res.send({  success: true,
-                        message : 'Vous êtes connecté avec le token',});
-
-    });
-  });
-});
 
 
 module.exports = app;
