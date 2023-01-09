@@ -57,7 +57,6 @@ app.use('/api/shoes', (req, res, next) => {
     ];
 
     res.status(200).json(shoes);
-    next();
   });
 
   app.use('/api/clothing', (req, res, next) => {
@@ -97,12 +96,11 @@ app.use('/api/shoes', (req, res, next) => {
     ];
     
     res.status(200).json(clothing);
-    next();
   });
 
   const Product = require('./models/product');
 
-  app.use('/api/add', (req, res, next) => {
+  app.use('/api/addProduct', (req, res, next) => {
     const product = new Product({
         title: 'doudoune',
         description: 'Les infos de mon deuxième objet',
@@ -112,21 +110,37 @@ app.use('/api/shoes', (req, res, next) => {
       });
     product.save()
       .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-      .catch(error => res.status(400).json({ error }));
-      next();
+      .catch(error => res.status(400).json({ error }))
   });
 
   app.use('/api/products', (req, res, next) => {
     Product.find()
       .then(products => res.status(200).json(products))
       .catch(error => res.status(400).json({ error }));
-      next();
   });
 
   app.get('/api/stuff/:id', (req, res, next) => {
     Thing.findOne({ _id: req.params.id })
       .then(thing => res.status(200).json(thing))
       .catch(error => res.status(404).json({ error }));
+  });
+
+  const User = require('./models/user');
+
+  app.use('/api/addUser', (req, res, next) => {
+    const user = new User({
+        lastname: 'volland',
+        firstname: 'dimitri',
+        email: 'd.volland@it-students.fr',
+        phoneNumber: 0671131522,
+        password: '123&é"AZEaze',
+        streetNumber: 16,
+        streetName: 'allée des charmilles',
+        zipCode: 69380,
+      });
+    user.save()
+      .then(() => res.status(201).json({ message: 'User enregistré !'}))
+      .catch(error => res.status(400).json({ error }));
   });
 
 module.exports = app;
