@@ -1,6 +1,19 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const passwordValidator = require('password-validator');
+const emailValidator = require('email-validator');
+
+const schema = new passwordValidator();
+
+schema
+.is().min(8)                                    // Minimum length 8
+.is().max(100)                                  // Maximum length 100
+.has().uppercase()                              // Must have uppercase letters
+.has().lowercase()                              // Must have lowercase letters
+.has().digits()                                // Must have digits
+.has().not().spaces()                           // Should not have spaces
+.is().not().oneOf(['Passw0rd', 'Password123', 'password', 'Password']); // Blacklist these values
 
 exports.createUser = (req, res, next) => {
   
@@ -14,7 +27,15 @@ exports.createUser = (req, res, next) => {
     streetName: req.body.streetName,
     zipCode: req.body.zipCode
   });
-  
+
+  if (!schema.validate(user.password)) {
+    res.status(400).json({message: "format password incorrect"})
+  }
+  else {
+    if(!emailValidator.validate(user.email)){
+      res.status(400).json({message: "format email incorrect"})
+    }
+    else {
   bcrypt.genSalt(saltRounds, function(err, salt) {
     bcrypt.hash(user.password, salt, function(err, hash) {
       user.password = hash;
@@ -34,8 +55,8 @@ exports.createUser = (req, res, next) => {
   );
 });
 });
-
-
+}
+}
 };
 
 
