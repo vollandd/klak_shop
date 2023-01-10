@@ -1,13 +1,13 @@
 
 require('dotenv').config();
-const express  = require('express');
-const app      = express();
+const express = require('express');
+const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 const mongoose = require('mongoose');
 
 const productRoutes = require('./routes/productRouter');
-
+const userRoutes = require('./routes/userRouter');
 
 
 mongoose.connect(process.env.ID_BDD,
@@ -24,3 +24,8 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+
+app.use('/api/',productRoutes);
+app.use('/api/',userRoutes);
+
+module.exports = app;

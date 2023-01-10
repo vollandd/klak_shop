@@ -7,7 +7,7 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 
-router.post('/', productController.createProduct);
+router.post('/createProduct', productController.createProduct);
 router.get('/', productController.getAllProduct);
 router.get('/product', productController.getAllProduct);
 router.get('/clothing', productController.getClothing);
