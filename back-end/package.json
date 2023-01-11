@@ -7,6 +7,7 @@
     "email-validator": "^2.0.4",
     "express": "^4.18.2",
     "joi": "^17.7.0",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.6.6",
     "password-validator": "^5.3.0",
     "process": "^0.11.10",
