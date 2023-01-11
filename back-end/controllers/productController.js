@@ -40,26 +40,39 @@ exports.getOneProduct = (req, res, next) => {
 };
 
 exports.modifyProduct = (req, res, next) => {
-  const product = new Product({
-    _id: req.params.id,
-    title: req.body.title,
-    description: req.body.description,
-    imageUrl: req.body.imageUrl,
-    price: req.body.price,
-    userId: req.body.userId
-  });
-  Product.updateOne({_id: req.params.id}, product).then(
-    () => {
-      res.status(201).json({
-        message: 'Product updated!'
+  Product.findOne({_id: req.params.id}).then(
+    (products) => {
+      if (!products) {
+        res.status(404).json({
+          message: 'Objet non trouvé !'
+        });
+      }
+      if (products.userId !== req.auth.userId) {
+        res.status(401).json({
+          message: 'Requête non autorisée !'
+        });
+      }
+      const product = new Product({
+        _id: req.params.id,
+        title: req.body.title,
+        description: req.body.description,
+        imageUrl: req.body.imageUrl,
+        price: req.body.price
       });
-    }
-  ).catch(
-    (error) => {
-      res.status(400).json({
-        error: error
-      });
-    }
+      Product.updateOne({_id: req.params.id}, product).then(
+        () => {
+          res.status(201).json({
+            message: 'Product updated!'
+          });
+        }
+      ).catch(
+        (error) => {
+          res.status(400).json({
+            error: error
+          });
+        }
+      );
+    }  
   );
 };
 
