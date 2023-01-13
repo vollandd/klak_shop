@@ -4,6 +4,19 @@ const saltRounds = 10;
 const passwordValidator = require('password-validator');
 const emailValidator = require('email-validator');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const nodemailer = require('nodemailer');
+const nodeoutlook = require('nodejs-nodemailer-outlook');
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.hostinger.com",
+  port: 465,
+  secure: true, // upgrade later with STARTTLS
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD_EMAIL
+  }
+});
 
 const schema = new passwordValidator();
 
@@ -44,6 +57,20 @@ exports.createUser = (req, res, next) => {
           res.status(400).json({message: "format email incorrect"})
         }
         else {
+          const mailOptions = {
+            from: "test@2mn.info",
+            to: user.email,
+            subject: 'mabrouk',
+            text: 'Bravo!!! Vous avez gagné un voyage au maroc tout frais payé pour une semaine!!'
+          };
+          
+          transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
           bcrypt.genSalt(saltRounds, function(err, salt) {
             bcrypt.hash(user.password, salt, function(err, hash) {
             user.password = hash;
@@ -152,7 +179,7 @@ exports.login = (req, res, next) => {
           }
           const token = jwt.sign(
             { userId: user._id },
-            'RANDOM_TOKEN_SECRET',
+            process.env.SECRET_TOKEN_KEY,
             { expiresIn: '24h' });
           res.status(200).json({
             userId: user._id,
