@@ -23,10 +23,6 @@ schema
 exports.login = (req, res, next) =>
 {
 
-
-
-
-
     // Validate parameters
     console.log(req.body);
     const email = req.body.email;
