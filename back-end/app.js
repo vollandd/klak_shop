@@ -6,29 +6,6 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 const userRoutes = require('./routes/userRouter');
 
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const validator = require("email-validator");
-const passwordValidator = require('password-validator');
-
-// Create a schema
-const schema = new passwordValidator();
-
-// Add properties to it
-schema
-    .is().min(8,'minimum 8 caractere')                                    // Minimum length 8
-    .has().symbols(1,'doit contenir au moins 1 symbol')
-    .has().uppercase(1, 'doit contenir au moins 1 majuscule')                              // Must have uppercase letters
-    .has().lowercase(1, 'doit contenir au moins 1 minuscule')                              // Must have lowercase letters
-    .has().digits(1,'doit contenir au moins 1 chiffre')                                // Must have at least 1 digits
-    .has().not().spaces()                           // Should not have spaces
-
-
-
-
-
-
-
 
 mongoose.connect(process.env.ID_BDD,
 { useNewUrlParser: true,
