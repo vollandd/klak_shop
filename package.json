@@ -3,7 +3,7 @@
   "version" : "0.1.0",
   "main" : "app.js",
   "scripts" : {
-    "start" : "node server.js"
+    "start" : "node back-end/server.js"
   },
   "engines" : {
     "node" : "^10"
