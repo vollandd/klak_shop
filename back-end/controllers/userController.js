@@ -59,7 +59,7 @@ exports.login = (req, res, next) =>
             // Return JWT to client
             res.send({
                 success: true,
-                message: 'Vous êtes connecté avec le token',
+                message: 'Vous êtes connecté avec le token ' + token,
             });
 
         });
