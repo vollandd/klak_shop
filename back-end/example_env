@@ -1,2 +1,2 @@
 ID_BDD='mongodb+srv://<username>:<password>@cluster0.mongodb.net/test?retryWrites=true&w=majority'
-PRIVATE_TOKEN='secret_token_for_jwt'
+PRIVATE_TOKEN = 'secret_token_for_jwt'
