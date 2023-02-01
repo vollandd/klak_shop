@@ -58,7 +58,7 @@ app.use((req, res, next) => {
     product.save()
       .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
       .catch(error => res.status(400).json({ error }));
-      next();
+
   });
 
   app.use('/api/products', (req, res, next) => {
